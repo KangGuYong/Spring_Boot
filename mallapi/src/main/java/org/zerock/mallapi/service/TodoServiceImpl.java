@@ -23,84 +23,86 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @Transactional
 @Log4j2
-@RequiredArgsConstructor // 생성자 자동 주입
+@RequiredArgsConstructor  // 생성자 자동 주입
 public class TodoServiceImpl implements TodoService {
 
-    // 자동주입 대상은 final로
-    private final ModelMapper modelMapper;
+  //자동주입 대상은 final로 
+  private final ModelMapper modelMapper;
 
-    private final TodoRepository todoRepository;
+  private final TodoRepository todoRepository;
 
-    @Override
-    public Long register(TodoDTO todoDTO) {
+  @Override
+  public Long register(TodoDTO todoDTO) {
+    
+    log.info(".........");
 
-        log.info(".........");
+    Todo todo = modelMapper.map(todoDTO, Todo.class);
 
-        Todo todo = modelMapper.map(todoDTO, Todo.class);
+    Todo savedTodo = todoRepository.save(todo);
 
-        Todo savedTodo = todoRepository.save(todo);
+    return savedTodo.getTno();
 
-        return savedTodo.getTno();
+  }
 
-    }
+  @Override
+  public TodoDTO get(Long tno) {
+    
+    java.util.Optional<Todo> result = todoRepository.findById(tno);
 
-    @Override
-    public TodoDTO get(Long tno) {
+    Todo todo = result.orElseThrow();
 
-        java.util.Optional<Todo> result = todoRepository.findById(tno);
+    TodoDTO dto = modelMapper.map(todo, TodoDTO.class);
 
-        Todo todo = result.orElseThrow();
+    return dto;
+  }
 
-        TodoDTO dto = modelMapper.map(todo, TodoDTO.class);
+  @Override
+  public void modify(TodoDTO todoDTO) {
 
-        return dto;
-    }
+    Optional<Todo> result = todoRepository.findById(todoDTO.getTno());
 
-    @Override
-    public void modify(TodoDTO todoDTO) {
+    Todo todo = result.orElseThrow();
 
-        Optional<Todo> result = todoRepository.findById(todoDTO.getTno());
+    todo.changeTitle(todoDTO.getTitle());
+    todo.changeDueDate(todoDTO.getDueDate());
+    todo.changeComplete(todoDTO.isComplete());
+ 
+    todoRepository.save(todo);
 
-        Todo todo = result.orElseThrow();
+  }
 
-        todo.changeTitle(todoDTO.getTitle());
-        todo.changeDueDate(todoDTO.getDueDate());
-        todo.changeComplete(todoDTO.isComplete());
+  @Override
+  public void remove(Long tno) {
+    
+    todoRepository.deleteById(tno);
 
-        todoRepository.save(todo);
+  }
 
-    }
+  @Override
+  public PageResponseDTO<TodoDTO> list(PageRequestDTO pageRequestDTO) {
 
-    @Override
-    public void remove(Long tno) {
+    Pageable pageable = 
+      PageRequest.of( 
+        pageRequestDTO.getPage() - 1 ,  // 1페이지가 0이므로 주의 
+        pageRequestDTO.getSize(), 
+        Sort.by("tno").descending());
 
-        todoRepository.deleteById(tno);
+    Page<Todo> result = todoRepository.findAll(pageable);    
 
-    }
+    List<TodoDTO> dtoList = result.getContent().stream()
+      .map(todo -> modelMapper.map(todo, TodoDTO.class))
+      .collect(Collectors.toList());
+    
+    long totalCount = result.getTotalElements();
 
-    @Override
-    public PageResponseDTO<TodoDTO> list(PageRequestDTO pageRequestDTO) {
+    PageResponseDTO<TodoDTO> responseDTO = PageResponseDTO.<TodoDTO>withAll()
+      .dtoList(dtoList)
+      .pageRequestDTO(pageRequestDTO)
+      .totalCount(totalCount)
+      .build();
 
-        Pageable pageable = PageRequest.of(
-                pageRequestDTO.getPage() - 1, // 1페이지가 0이므로 주의
-                pageRequestDTO.getSize(),
-                Sort.by("tno").descending());
+    return responseDTO;
+  }
 
-        Page<Todo> result = todoRepository.findAll(pageable);
-
-        List<TodoDTO> dtoList = result.getContent().stream()
-                .map(todo -> modelMapper.map(todo, TodoDTO.class))
-                .collect(Collectors.toList());
-
-        long totalCount = result.getTotalElements();
-
-        PageResponseDTO<TodoDTO> responseDTO = PageResponseDTO.<TodoDTO>withAll()
-                .dtoList(dtoList)
-                .pageRequestDTO(pageRequestDTO)
-                .totalCount(totalCount)
-                .build();
-
-        return responseDTO;
-    }
 
 }

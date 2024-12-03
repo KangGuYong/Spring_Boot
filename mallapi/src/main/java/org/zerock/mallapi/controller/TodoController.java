@@ -18,60 +18,63 @@ import org.zerock.mallapi.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+
 @RestController
 @RequiredArgsConstructor
 @Log4j2
 @RequestMapping("/api/todo")
 public class TodoController {
+  
+  private final TodoService service;
 
-    private final TodoService service;
+  @GetMapping("/{tno}")
+  public TodoDTO get(@PathVariable(name ="tno") Long tno) {
 
-    @GetMapping("/{tno}")
-    public TodoDTO get(@PathVariable(name = "tno") Long tno) {
+    return service.get(tno);
+  }
 
-        return service.get(tno);
-    }
+  @GetMapping("/list")
+  public PageResponseDTO<TodoDTO> list(PageRequestDTO pageRequestDTO ) {
 
-    @GetMapping("/list")
-    public PageResponseDTO<TodoDTO> list(PageRequestDTO pageRequestDTO) {
+    log.info(pageRequestDTO);
 
-        log.info(pageRequestDTO);
+    return service.list(pageRequestDTO);
+  }
 
-        return service.list(pageRequestDTO);
-    }
+  @PostMapping("/")
+  public Map<String, Long> register(@RequestBody TodoDTO todoDTO){
+   
+    log.info("TodoDTO: " + todoDTO);
 
-    @PostMapping("/")
-    public Map<String, Long> register(@RequestBody TodoDTO todoDTO) {
+    Long tno = service.register(todoDTO);
+    
+    return Map.of("TNO", tno);
+  }
 
-        log.info("TodoDTO: " + todoDTO);
+  @PutMapping("/{tno}")
+  public Map<String, String> modify( 
+    @PathVariable(name="tno") Long tno, 
+    @RequestBody TodoDTO todoDTO) {
 
-        Long tno = service.register(todoDTO);
+    todoDTO.setTno(tno);
 
-        return Map.of("TNO", tno);
-    }
+    log.info("Modify: " + todoDTO);
 
-    @PutMapping("/{tno}")
-    public Map<String, String> modify(
-            @PathVariable(name = "tno") Long tno,
-            @RequestBody TodoDTO todoDTO) {
+    service.modify(todoDTO);
 
-        todoDTO.setTno(tno);
+    return Map.of("RESULT", "SUCCESS");
+  }
 
-        log.info("Modify: " + todoDTO);
+  @DeleteMapping("/{tno}")
+  public Map<String, String> remove( @PathVariable(name="tno") Long tno ){
 
-        service.modify(todoDTO);
+    log.info("Remove:  " + tno);
 
-        return Map.of("RESULT", "SUCCESS");
-    }
+    service.remove(tno);
 
-    @DeleteMapping("/{tno}")
-    public Map<String, String> remove(@PathVariable(name = "tno") Long tno) {
+    return Map.of("RESULT", "SUCCESS");
+  }
 
-        log.info("Remove:  " + tno);
 
-        service.remove(tno);
-
-        return Map.of("RESULT", "SUCCESS");
-    }
 
 }

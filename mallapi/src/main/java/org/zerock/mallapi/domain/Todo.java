@@ -13,29 +13,30 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Todo {
+  
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long tno;
+  
+  private String title;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tno;
+  private String writer;
 
-    private String title;
+  private boolean complete;
 
-    private String writer;
+  private LocalDate dueDate;
 
-    private boolean complete;
+  public void changeTitle(String title){
+    this.title = title;
+  }
 
-    private LocalDate dueDate;
+  public void changeComplete(boolean complete){
+    this.complete = complete;
+  }
 
-    public void changeTitle(String title) {
-        this.title = title;
-    }
+  public void changeDueDate(LocalDate dueDate){
+    this.dueDate = dueDate;
+  }
 
-    public void changeComplete(boolean complete) {
-        this.complete = complete;
-    }
-
-    public void changeDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
-    }
 
 }

@@ -14,14 +14,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class TodoDTO {
 
-    private Long tno;
+  private Long tno;
 
-    private String title;
+  private String title;
 
-    private String writer;
+  private String writer;
 
-    private boolean complete;
+  private boolean complete;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate dueDate;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  private LocalDate dueDate;
 }
