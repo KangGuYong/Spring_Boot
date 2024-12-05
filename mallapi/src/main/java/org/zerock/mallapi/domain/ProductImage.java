@@ -11,11 +11,11 @@ import lombok.*;
 @NoArgsConstructor
 public class ProductImage {
 
-    private String fileName; 
+    private String fileName;
 
     private int ord;
 
-    public void setOrd(int ord){
+    public void setOrd(int ord) {
         this.ord = ord;
     }
 

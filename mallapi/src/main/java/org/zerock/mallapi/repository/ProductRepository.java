@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.zerock.mallapi.domain.Product;
 
-public interface ProductRepository extends JpaRepository<Product, Long>{
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
   @EntityGraph(attributePaths = "imageList")
   @Query("select p from Product p where p.pno = :pno")
@@ -19,9 +19,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
 
   @Modifying
   @Query("update Product p set p.delFlag = :flag where p.pno = :pno")
-  void updateToDelete(@Param("pno") Long pno , @Param("flag") boolean flag);
+  void updateToDelete(@Param("pno") Long pno, @Param("flag") boolean flag);
 
-  
   @Query("select p, pi  from Product p left join p.imageList pi  where pi.ord = 0 and p.delFlag = false ")
   Page<Object[]> selectList(Pageable pageable);
 }

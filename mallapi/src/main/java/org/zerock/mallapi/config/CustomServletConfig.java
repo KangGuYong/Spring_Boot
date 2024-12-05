@@ -7,22 +7,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.zerock.mallapi.controller.formatter.LocalDateFormatter;
 
 @Configuration
-public class CustomServletConfig implements WebMvcConfigurer{
+public class CustomServletConfig implements WebMvcConfigurer {
 
   @Override
   public void addFormatters(FormatterRegistry registry) {
-    
+
     registry.addFormatter(new LocalDateFormatter());
   }
 
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
+  // @Override
+  // public void addCorsMappings(CorsRegistry registry) {
 
-    registry.addMapping("/**")
-            .allowedOrigins("*")
-            .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS")
-            .maxAge(300)
-            .allowedHeaders("Authorization", "Cache-Control", "Content-Type");
-  }
+  // registry.addMapping("/**")
+  // .allowedOrigins("*")
+  // .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS")
+  // .maxAge(300)
+  // .allowedHeaders("Authorization", "Cache-Control", "Content-Type");
+  // }
 
 }

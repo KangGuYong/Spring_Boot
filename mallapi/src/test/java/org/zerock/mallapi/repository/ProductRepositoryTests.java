@@ -23,22 +23,22 @@ public class ProductRepositoryTests {
 
   @Autowired
   ProductRepository productRepository;
-  
+
   @Test
   public void testInsert() {
 
     for (int i = 0; i < 10; i++) {
 
       Product product = Product.builder()
-      .pname("상품"+i)
-      .price(100*i)
-      .pdesc("상품설명 " + i)
-      .build();
-      
-      //2개의 이미지 파일 추가 
+          .pname("상품" + i)
+          .price(100 * i)
+          .pdesc("상품설명 " + i)
+          .build();
+
+      // 2개의 이미지 파일 추가
       product.addImageString("IMAGE1.jpg");
       product.addImageString("IMAGE2.jpg");
-      
+
       productRepository.save(product);
 
       log.info("-------------------");
@@ -71,7 +71,7 @@ public class ProductRepositoryTests {
 
     log.info(product);
     log.info(product.getImageList());
-    
+
   }
 
   @Commit
@@ -86,7 +86,7 @@ public class ProductRepositoryTests {
   }
 
   @Test
-  public void testUpdate(){
+  public void testUpdate() {
 
     Long pno = 10L;
 
@@ -96,12 +96,12 @@ public class ProductRepositoryTests {
     product.changeDesc("10번 상품 설명입니다.");
     product.changePrice(5000);
 
-    //첨부파일 수정 
+    // 첨부파일 수정
     product.clearList();
 
-    product.addImageString(UUID.randomUUID().toString()+"_"+"NEWIMAGE1.jpg");
-    product.addImageString(UUID.randomUUID().toString()+"_"+"NEWIMAGE2.jpg");
-    product.addImageString(UUID.randomUUID().toString()+"_"+"NEWIMAGE3.jpg");
+    product.addImageString(UUID.randomUUID().toString() + "_" + "NEWIMAGE1.jpg");
+    product.addImageString(UUID.randomUUID().toString() + "_" + "NEWIMAGE2.jpg");
+    product.addImageString(UUID.randomUUID().toString() + "_" + "NEWIMAGE3.jpg");
 
     productRepository.save(product);
 
@@ -110,16 +110,14 @@ public class ProductRepositoryTests {
   @Test
   public void testList() {
 
-    //org.springframework.data.domain 패키지
+    // org.springframework.data.domain 패키지
     Pageable pageable = PageRequest.of(0, 10, Sort.by("pno").descending());
 
     Page<Object[]> result = productRepository.selectList(pageable);
 
-    //java.util
+    // java.util
     result.getContent().forEach(arr -> log.info(Arrays.toString(arr)));
 
   }
-
-
 
 }
