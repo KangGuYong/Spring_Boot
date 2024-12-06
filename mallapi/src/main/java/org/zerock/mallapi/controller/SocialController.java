@@ -19,36 +19,36 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class SocialController {
 
-  private final MemberService memberService;
+    private final MemberService memberService;
 
-  @GetMapping("/api/member/kakao")
-  public Map<String, Object> getMemberFromKakao(String accessToken) {
+    @GetMapping("/api/member/kakao")
+    public Map<String, Object> getMemberFromKakao(String accessToken) {
 
-    log.info("access Token ");
-    log.info(accessToken);
+        log.info("access Token ");
+        log.info(accessToken);
 
-    MemberDTO memberDTO = memberService.getKakaoMember(accessToken);
+        MemberDTO memberDTO = memberService.getKakaoMember(accessToken);
 
-    Map<String, Object> claims = memberDTO.getClaims();
+        Map<String, Object> claims = memberDTO.getClaims();
 
-    String jwtAccessToken = JWTUtil.generateToken(claims, 10);
-    String jwtRefreshToken = JWTUtil.generateToken(claims, 60 * 24);
+        String jwtAccessToken = JWTUtil.generateToken(claims, 10);
+        String jwtRefreshToken = JWTUtil.generateToken(claims, 60 * 24);
 
-    claims.put("accessToken", jwtAccessToken);
-    claims.put("refreshToken", jwtRefreshToken);
+        claims.put("accessToken", jwtAccessToken);
+        claims.put("refreshToken", jwtRefreshToken);
 
-    return claims;
-  }
+        return claims;
+    }
 
-  @PutMapping("/api/member/modify")
-  public Map<String, String> modify(@RequestBody MemberModifyDTO memberModifyDTO) {
+    @PutMapping("/api/member/modify")
+    public Map<String, String> modify(@RequestBody MemberModifyDTO memberModifyDTO) {
 
-    log.info("member modify: " + memberModifyDTO);
+        log.info("member modify: " + memberModifyDTO);
 
-    memberService.modifyMember(memberModifyDTO);
+        memberService.modifyMember(memberModifyDTO);
 
-    return Map.of("result", "modified");
+        return Map.of("result", "modified");
 
-  }
+    }
 
 }

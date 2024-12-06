@@ -1,12 +1,16 @@
 package org.zerock.mallapi.repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
-import org.zerock.mallapi.domain.*;
+import org.zerock.mallapi.domain.Cart;
+import org.zerock.mallapi.domain.CartItem;
+import org.zerock.mallapi.domain.Member;
+import org.zerock.mallapi.domain.Product;
 import org.zerock.mallapi.dto.CartItemListDTO;
 
 import jakarta.transaction.Transactional;
@@ -31,7 +35,7 @@ public class CartRepositoryTests {
 
         // 사용자가 전송하는 정보
         String email = "user1@aaa.com";
-        Long pno = 1L;
+        Long pno = 5L;
         int qty = 2;
 
         // 만일 기존에 사용자의 장바구니 아이템이 있었다면
@@ -83,9 +87,9 @@ public class CartRepositoryTests {
 
     @Test
     @Commit
-    public void testUpdateByCino() {
+    public void tesstUpdateByCino() {
 
-        Long cino = 2L;
+        Long cino = 1L;
 
         int qty = 4;
 

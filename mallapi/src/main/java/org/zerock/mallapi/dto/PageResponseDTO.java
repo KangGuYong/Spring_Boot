@@ -1,11 +1,11 @@
 package org.zerock.mallapi.dto;
 
-import lombok.Builder;
-import lombok.Data;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 public class PageResponseDTO<E> {

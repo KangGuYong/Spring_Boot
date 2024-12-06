@@ -1,12 +1,18 @@
 package org.zerock.mallapi.service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.zerock.mallapi.domain.Cart;
+import org.zerock.mallapi.domain.CartItem;
+import org.zerock.mallapi.domain.Member;
+import org.zerock.mallapi.domain.Product;
+import org.zerock.mallapi.dto.CartItemDTO;
+import org.zerock.mallapi.dto.CartItemListDTO;
+import org.zerock.mallapi.repository.CartItemRepository;
+import org.zerock.mallapi.repository.CartRepository;
 
-import org.zerock.mallapi.domain.*;
-import org.zerock.mallapi.dto.*;
-import org.zerock.mallapi.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 

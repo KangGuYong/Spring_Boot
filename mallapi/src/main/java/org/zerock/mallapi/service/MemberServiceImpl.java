@@ -26,121 +26,121 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class MemberServiceImpl implements MemberService {
 
-  private final MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
-  private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-  @Override
-  public MemberDTO getKakaoMember(String accessToken) {
+    @Override
+    public MemberDTO getKakaoMember(String accessToken) {
 
-    String email = getEmailFromKakaoAccessToken(accessToken);
+        String email = getEmailFromKakaoAccessToken(accessToken);
 
-    log.info("email: " + email);
+        log.info("email: " + email);
 
-    Optional<Member> result = memberRepository.findById(email);
+        Optional<Member> result = memberRepository.findById(email);
 
-    // 기존의 회원
-    if (result.isPresent()) {
+        // 기존의 회원
+        if (result.isPresent()) {
 
-      MemberDTO memberDTO = entityToDTO(result.get());
+            MemberDTO memberDTO = entityToDTO(result.get());
 
-      return memberDTO;
+            return memberDTO;
+
+        }
+
+        // 회원이 아니었다면
+        // 닉네임은 '소셜회원'으로
+        // 패스워드는 임의로 생성
+        Member socialMember = makeSocialMember(email);
+        memberRepository.save(socialMember);
+
+        MemberDTO memberDTO = entityToDTO(socialMember);
+
+        return memberDTO;
 
     }
 
-    // 회원이 아니었다면
-    // 닉네임은 '소셜회원'으로
-    // 패스워드는 임의로 생성
-    Member socialMember = makeSocialMember(email);
-    memberRepository.save(socialMember);
+    private String getEmailFromKakaoAccessToken(String accessToken) {
 
-    MemberDTO memberDTO = entityToDTO(socialMember);
+        String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
 
-    return memberDTO;
+        if (accessToken == null) {
+            throw new RuntimeException("Access Token is null");
+        }
+        RestTemplate restTemplate = new RestTemplate();
 
-  }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
-  private String getEmailFromKakaoAccessToken(String accessToken) {
+        UriComponents uriBuilder = UriComponentsBuilder.fromHttpUrl(kakaoGetUserURL).build();
 
-    String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
+        ResponseEntity<LinkedHashMap> response = restTemplate.exchange(
+                uriBuilder.toString(),
+                HttpMethod.GET,
+                entity,
+                LinkedHashMap.class);
 
-    if (accessToken == null) {
-      throw new RuntimeException("Access Token is null");
+        log.info(response);
+
+        LinkedHashMap<String, LinkedHashMap> bodyMap = response.getBody();
+
+        log.info("------------------------------------");
+        log.info(bodyMap);
+
+        LinkedHashMap<String, String> kakaoAccount = bodyMap.get("kakao_account");
+
+        log.info("kakaoAccount: " + kakaoAccount);
+
+        return kakaoAccount.get("email");
+
     }
-    RestTemplate restTemplate = new RestTemplate();
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + accessToken);
-    headers.add("Content-Type", "application/x-www-form-urlencoded");
-    HttpEntity<String> entity = new HttpEntity<>(headers);
+    private Member makeSocialMember(String email) {
 
-    UriComponents uriBuilder = UriComponentsBuilder.fromHttpUrl(kakaoGetUserURL).build();
+        String tempPassword = makeTempPassword();
 
-    ResponseEntity<LinkedHashMap> response = restTemplate.exchange(
-        uriBuilder.toString(),
-        HttpMethod.GET,
-        entity,
-        LinkedHashMap.class);
+        log.info("tempPassword: " + tempPassword);
 
-    log.info(response);
+        String nickname = "소셜회원";
 
-    LinkedHashMap<String, LinkedHashMap> bodyMap = response.getBody();
+        Member member = Member.builder()
+                .email(email)
+                .pw(passwordEncoder.encode(tempPassword))
+                .nickname(nickname)
+                .social(true)
+                .build();
 
-    log.info("------------------------------------");
-    log.info(bodyMap);
+        member.addRole(MemberRole.USER);
 
-    LinkedHashMap<String, String> kakaoAccount = bodyMap.get("kakao_account");
+        return member;
 
-    log.info("kakaoAccount: " + kakaoAccount);
-
-    return kakaoAccount.get("email");
-
-  }
-
-  private Member makeSocialMember(String email) {
-
-    String tempPassword = makeTempPassword();
-
-    log.info("tempPassword: " + tempPassword);
-
-    String nickname = "소셜회원";
-
-    Member member = Member.builder()
-        .email(email)
-        .pw(passwordEncoder.encode(tempPassword))
-        .nickname(nickname)
-        .social(true)
-        .build();
-
-    member.addRole(MemberRole.USER);
-
-    return member;
-
-  }
-
-  private String makeTempPassword() {
-
-    StringBuffer buffer = new StringBuffer();
-
-    for (int i = 0; i < 10; i++) {
-      buffer.append((char) ((int) (Math.random() * 55) + 65));
     }
-    return buffer.toString();
-  }
 
-  @Override
-  public void modifyMember(MemberModifyDTO memberModifyDTO) {
+    private String makeTempPassword() {
 
-    Optional<Member> result = memberRepository.findById(memberModifyDTO.getEmail());
+        StringBuffer buffer = new StringBuffer();
 
-    Member member = result.orElseThrow();
+        for (int i = 0; i < 10; i++) {
+            buffer.append((char) ((int) (Math.random() * 55) + 65));
+        }
+        return buffer.toString();
+    }
 
-    member.changePw(passwordEncoder.encode(memberModifyDTO.getPw()));
-    member.changeSocial(false);
-    member.changeNickname(memberModifyDTO.getNickname());
+    @Override
+    public void modifyMember(MemberModifyDTO memberModifyDTO) {
 
-    memberRepository.save(member);
+        Optional<Member> result = memberRepository.findById(memberModifyDTO.getEmail());
 
-  }
+        Member member = result.orElseThrow();
+
+        member.changePw(passwordEncoder.encode(memberModifyDTO.getPw()));
+        member.changeSocial(false);
+        member.changeNickname(memberModifyDTO.getNickname());
+
+        memberRepository.save(member);
+
+    }
 
 }

@@ -1,8 +1,14 @@
 package org.zerock.mallapi.dto;
 
-import lombok.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
