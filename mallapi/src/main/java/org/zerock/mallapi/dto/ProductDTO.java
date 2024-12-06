@@ -1,20 +1,23 @@
 package org.zerock.mallapi.dto;
 
-import java.util.*;
-
-import org.springframework.web.multipart.MultipartFile;
-
 import lombok.*;
+import java.util.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDTO {
+
     private Long pno;
+
     private String pname;
+
     private int price;
+
     private String pdesc;
+
     private boolean delFlag;
 
     @Builder.Default

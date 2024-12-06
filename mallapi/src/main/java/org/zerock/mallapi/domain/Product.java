@@ -1,10 +1,10 @@
 package org.zerock.mallapi.domain;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tbl_product")
@@ -20,8 +20,11 @@ public class Product {
     private Long pno;
 
     private String pname;
+
     private int price;
+
     private String pdesc;
+
     private boolean delFlag;
 
     public void changeDel(boolean delFlag) {
@@ -45,19 +48,21 @@ public class Product {
     }
 
     public void addImage(ProductImage image) {
+
         image.setOrd(this.imageList.size());
         imageList.add(image);
     }
 
     public void addImageString(String fileName) {
+
         ProductImage productImage = ProductImage.builder()
                 .fileName(fileName)
                 .build();
         addImage(productImage);
+
     }
 
     public void clearList() {
         this.imageList.clear();
     }
-
 }

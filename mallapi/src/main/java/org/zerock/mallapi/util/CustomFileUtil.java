@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import net.coobird.thumbnailator.Thumbnails;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -18,14 +22,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import net.coobird.thumbnailator.Thumbnails;
 
 @Component
 @Log4j2
 @RequiredArgsConstructor
 public class CustomFileUtil {
+
     @Value("${org.zerock.upload.path}")
     private String uploadPath;
 
@@ -36,45 +38,59 @@ public class CustomFileUtil {
         if (tempFolder.exists() == false) {
             tempFolder.mkdir();
         }
+
         uploadPath = tempFolder.getAbsolutePath();
-        log.info("----------------------");
+
+        log.info("-------------------------------------");
         log.info(uploadPath);
     }
 
     public List<String> saveFiles(List<MultipartFile> files) throws RuntimeException {
+
         if (files == null || files.size() == 0) {
-            return List.of();
+            return null;
         }
 
         List<String> uploadNames = new ArrayList<>();
+
         for (MultipartFile multipartFile : files) {
-            String savedName = UUID.randomUUID().toString() + "_" + multipartFile
-                    .getOriginalFilename();
+
+            String savedName = UUID.randomUUID().toString() + "_" + multipartFile.getOriginalFilename();
 
             Path savePath = Paths.get(uploadPath, savedName);
 
             try {
                 Files.copy(multipartFile.getInputStream(), savePath);
+
                 String contentType = multipartFile.getContentType();
-                if (contentType != null && contentType.startsWith("image")) {
+
+                if (contentType != null && contentType.startsWith("image")) { // 이미지여부 확인
+
                     Path thumbnailPath = Paths.get(uploadPath, "s_" + savedName);
+
                     Thumbnails.of(savePath.toFile())
-                            .size(200, 200)
+                            .size(400, 400)
                             .toFile(thumbnailPath.toFile());
                 }
+
                 uploadNames.add(savedName);
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage());
             }
-        }
+        } // end for
         return uploadNames;
     }
 
     public ResponseEntity<Resource> getFile(String fileName) {
+
         Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
-        if (!resource.isReadable()) {
-            resource = new FileSystemResource(uploadPath + File.separator + "default.jpg");
+
+        if (!resource.exists()) {
+
+            resource = new FileSystemResource(uploadPath + File.separator + "default.jpeg");
+
         }
+
         HttpHeaders headers = new HttpHeaders();
 
         try {
@@ -85,15 +101,19 @@ public class CustomFileUtil {
         return ResponseEntity.ok().headers(headers).body(resource);
     }
 
-    public void deleteFile(List<String> fileNames) {
+    public void deleteFiles(List<String> fileNames) {
+
         if (fileNames == null || fileNames.size() == 0) {
             return;
         }
+
         fileNames.forEach(fileName -> {
 
+            // 썸네일이 있는지 확인하고 삭제
             String thumbnailFileName = "s_" + fileName;
             Path thumbnailPath = Paths.get(uploadPath, thumbnailFileName);
             Path filePath = Paths.get(uploadPath, fileName);
+
             try {
                 Files.deleteIfExists(filePath);
                 Files.deleteIfExists(thumbnailPath);
@@ -102,4 +122,5 @@ public class CustomFileUtil {
             }
         });
     }
+
 }
