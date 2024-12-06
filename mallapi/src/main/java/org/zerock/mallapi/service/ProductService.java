@@ -7,15 +7,14 @@ import org.zerock.mallapi.dto.ProductDTO;
 
 @Transactional
 public interface ProductService {
+    PageResponseDTO<ProductDTO> getList(PageRequestDTO pageRequestDTO);
 
-  PageResponseDTO<ProductDTO> getList(PageRequestDTO pageRequestDTO);
+    Long register(ProductDTO productDTO);
 
-  Long register(ProductDTO productDTO);
+    ProductDTO get(Long pno);
 
-  ProductDTO get(Long pno);
+    void modify(ProductDTO productDTO);
 
-  void modify(ProductDTO productDTO);
-
-  void remove(Long pno);
+    void remove(Long pno);
 
 }
